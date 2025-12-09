@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Tracing Workbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Letter Tracing Fun!</h1>
+    <p>Trace the letters on the canvas below. Change colors for more fun!</p>
+    <div class="workbook-container">
+        <canvas id="tracing-canvas" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="color-palette">
+                <button class="color-btn" style="background-color: #333;" data-color="#333"></button>
+                <button class="color-btn" style="background-color: #ff0000;" data-color="#ff0000"></button>
+                <button class="color-btn" style="background-color: #0000ff;" data-color="#0000ff"></button>
+                <button class="color-btn" style="background-color: #008000;" data-color="#008000"></button>
+            </div>
+            <div>
+                <button id="prev-btn">Previous</button>
+                <button id="next-btn">Next</button>
+                <button id="clear-btn">Clear</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
