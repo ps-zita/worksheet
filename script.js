@@ -1,59 +1,66 @@
-const canvas = document.getElementById('tracing-canvas');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const clearBtn = document.getElementById('clear-btn');
-const nextBtn = document.getElementById('next-btn');
-const prevBtn = document.getElementById('prev-btn');
-const colorBtns = document.querySelectorAll('.color-btn');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const clearBtn = document.getElementById('clear');
 
 let isDrawing = false;
 let currentLetter = 'A';
 let drawColor = '#333';
+let lastX = 0;
+let lastY = 0;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.7;
+    drawLetter(currentLetter);
+}
 
 function drawLetter(letter) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "300px sans-serif";
+    const fontSize = Math.min(canvas.width, canvas.height) * 0.8;
+    ctx.font = `${fontSize}px sans-serif`;
     ctx.fillStyle = '#f0f0f0';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(letter, canvas.width / 2, canvas.height / 2);
 }
 
-function getPosition(e) {
+function getCoords(e) {
     if (e.touches) {
-        const rect = canvas.getBoundingClientRect();
         return {
-            offsetX: e.touches[0].clientX - rect.left,
-            offsetY: e.touches[0].clientY - rect.top
+            x: e.touches[0].clientX - canvas.offsetLeft,
+            y: e.touches[0].clientY - canvas.offsetTop
         };
     }
     return {
-        offsetX: e.offsetX,
-        offsetY: e.offsetY
+        x: e.clientX - canvas.offsetLeft,
+        y: e.clientY - canvas.offsetTop
     };
 }
 
 function startDrawing(e) {
-    e.preventDefault();
     isDrawing = true;
-    const { offsetX, offsetY } = getPosition(e);
-    ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY);
+    const { x, y } = getCoords(e);
+    [lastX, lastY] = [x, y];
 }
 
 function draw(e) {
     if (!isDrawing) return;
     e.preventDefault();
-    const { offsetX, offsetY } = getPosition(e);
+    const { x, y } = getCoords(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
     ctx.lineWidth = 10;
     ctx.lineCap = 'round';
     ctx.strokeStyle = drawColor;
-    ctx.lineTo(offsetX, offsetY);
     ctx.stroke();
+    [lastX, lastY] = [x, y];
 }
 
 function stopDrawing() {
     isDrawing = false;
-    ctx.closePath();
 }
 
 function clearCanvas() {
@@ -76,28 +83,19 @@ function prevLetter() {
     drawLetter(currentLetter);
 }
 
-function changeColor(e) {
-    drawColor = e.target.dataset.color;
-    colorBtns.forEach(btn => btn.classList.remove('active'));
-    e.target.classList.add('active');
-}
-
-// Mouse events
+// Event Listeners
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mouseout', stopDrawing);
 
-// Touch events
 canvas.addEventListener('touchstart', startDrawing);
 canvas.addEventListener('touchmove', draw);
 canvas.addEventListener('touchend', stopDrawing);
 
-clearBtn.addEventListener('click', clearCanvas);
-nextBtn.addEventListener('click', nextLetter);
 prevBtn.addEventListener('click', prevLetter);
-colorBtns.forEach(btn => btn.addEventListener('click', changeColor));
+nextBtn.addEventListener('click', nextLetter);
+clearBtn.addEventListener('click', clearCanvas);
 
-// Initial setup
-drawLetter(currentLetter);
-colorBtns[0].classList.add('active');
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
